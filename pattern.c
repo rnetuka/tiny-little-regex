@@ -19,10 +19,8 @@ Pattern *pattern_new(const char *string)
 
 void pattern_free(Pattern *pattern)
 {
-    for (int i = 0; pattern->tokens[i] != NULL; i++)
-        token_free(pattern->tokens[i]);
-
-    free(pattern->tokens);
+    list_apply(pattern->tokens, token_free);
+    list_free(pattern->tokens);
 
     if (pattern->state_machine)
         state_machine_free(pattern->state_machine);
@@ -47,9 +45,9 @@ void pattern_compile(Pattern *pattern)
 
     State *connection_point = state_machine->initial_state;
 
-    for (int i = 0; pattern->tokens[i] != NULL; i++)
+    for (int i = 0; i < list_size(pattern->tokens); i++)
     {
-        Token *token = pattern->tokens[i];
+        Token *token = list_get(pattern->tokens, i);
 
         for (int j = 0; j < token->quantifier->min; j++)
         {
@@ -77,7 +75,7 @@ void pattern_compile(Pattern *pattern)
                                    .to=connection_point);
         }
 
-        bool last_token = pattern->tokens[i + 1] == NULL;
+        bool last_token = (i == list_size(pattern->tokens) - 1);
 
         if (last_token)
             connection_point->accepting = true;

@@ -7,6 +7,7 @@
 #include <stddef.h>
 
 #include "quantifier.h"
+#include "util/list.h"
 
 typedef enum
 {
@@ -32,4 +33,4 @@ void token_free(Token *token);
 const char *token_string(const Token *token);
 bool token_matches(const Token *token, char character);
 
-void tokenize(const char *string, Token ***placeholder);
+void tokenize(const char *string, List **placeholder);

@@ -177,7 +177,7 @@ bool token_matches(const Token *token, char c)
     return false;
 }
 
-void tokenize(const char *string, Token ***placeholder)
+void tokenize(const char *string, List **placeholder)
 {
     List *tokens = list_new();
 
@@ -255,18 +255,11 @@ void tokenize(const char *string, Token ***placeholder)
         list_add(tokens, token);
     }
 
-    *placeholder = malloc((list_size(tokens) + 1) * sizeof(Token));
-
-    for (int i = 0; i < list_size(tokens); i++)
-        (*placeholder)[i] = list_get(tokens, i);
-
-    (*placeholder)[list_size(tokens)] = NULL;
-    goto finally;
+    *placeholder = tokens;
+    return;
 
     error:
     fprintf(stderr, "Invalid regex: %s", string);
     list_apply(tokens, token_free);
-
-    finally:
     list_free(tokens);
 }

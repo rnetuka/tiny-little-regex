@@ -6,11 +6,12 @@
 
 #include "statemach.h"
 #include "token.h"
+#include "util/list.h"
 
 typedef struct
 {
     const char *string;
-    Token **tokens;
+    List *tokens;
     StateMachine *state_machine;
 }
 Pattern;
