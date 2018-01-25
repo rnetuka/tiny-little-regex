@@ -30,7 +30,6 @@ Token;
 
 Token *token_new(const char *string);
 void token_free(Token *token);
-const char *token_string(const Token *token);
 bool token_matches(const Token *token, char character);
 
 void tokenize(const char *string, List **placeholder);

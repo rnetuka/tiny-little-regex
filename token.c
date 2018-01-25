@@ -122,13 +122,9 @@ void token_free(Token *token)
     if (token->quantifier)
         quantifier_free(token->quantifier);
 
+    free(token->string);
     free(token->inner_string);
     free(token);
-}
-
-const char *token_string(const Token *token)
-{
-    return token->string;
 }
 
 bool token_matches(const Token *token, char c)
