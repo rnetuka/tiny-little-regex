@@ -5,9 +5,6 @@
 #include <stdlib.h>
 
 #include "pattern.h"
-#include "statemach.h"
-#include "token.h"
-#include "quantifier.h"
 
 Pattern *pattern_new(const char *string)
 {
