@@ -6,8 +6,8 @@
 
 #include <stdbool.h>
 
-#include "list.h"
-#include "stack.h"
+#include "util/list.h"
+#include "util/stack.h"
 #include "token.h"
 
 struct StateMachine;

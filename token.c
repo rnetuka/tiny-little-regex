@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "token.h"
-#include "list.h"
+#include "util/list.h"
 
 Token *token_new(const char *string)
 {
