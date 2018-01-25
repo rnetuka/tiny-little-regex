@@ -2,6 +2,9 @@
 // Created by rnetuka on 2.1.18.
 //
 
+#define _GNU_SOURCE
+
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "pattern.h"
@@ -9,7 +12,7 @@
 Pattern *pattern_new(const char *string)
 {
     Pattern *pattern = malloc(sizeof(Pattern));
-    pattern->string = string;
+    asprintf(&pattern->string, "%s", string);
     tokenize(string, &(pattern->tokens));
     return pattern;
 }
@@ -22,6 +25,7 @@ void pattern_free(Pattern *pattern)
     if (pattern->state_machine)
         state_machine_free(pattern->state_machine);
 
+    free(pattern->string);
     free(pattern);
 }
 

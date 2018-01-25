@@ -10,7 +10,7 @@
 
 typedef struct
 {
-    const char *string;
+    char *string;
     List *tokens;
     StateMachine *state_machine;
 }
