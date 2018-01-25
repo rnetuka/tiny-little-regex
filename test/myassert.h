@@ -11,3 +11,15 @@
         printf("OK\n"); \
     else \
         printf("Failed\n");
+
+#define assert_true(result) \
+    if ((result)) \
+            printf("OK\n"); \
+        else \
+            printf("Failed\n");
+
+#define assert_false(result) \
+    if (!(result)) \
+            printf("OK\n"); \
+        else \
+            printf("Failed\n");

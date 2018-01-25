@@ -2,6 +2,8 @@
 // Created by rnetuka on 4.1.18.
 //
 
+#define _GNU_SOURCE
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,9 +11,11 @@
 
 #include "quantifier.h"
 
+#define strtoi(string, error) (int) strtol(string, error, 10)
+
 Quantifier *quantifier_new(const char *string)
 {
-    if (! string || strlen(string) == 0)
+    if (!string || strlen(string) == 0)
         goto error;
 
     if (strcmp(string, "*") == 0)
@@ -23,15 +27,15 @@ Quantifier *quantifier_new(const char *string)
     else if (strcmp(string, "?") == 0)
         string = "{0,1}";
 
-    if (string[0] != '{')
+    else if (string[0] != '{')
         goto error;
 
-    if (string[strlen(string) - 1] != '}')
+    else if (string[strlen(string) - 1] != '}')
         goto error;
 
     int min, max;
 
-    if (strchr(string, ','))        // range {x,y}
+    if (strchr(string, ','))        // range {n,m}
     {
         char working_copy[strlen(string) + 1];
         strcpy(working_copy, string);
@@ -42,7 +46,7 @@ Quantifier *quantifier_new(const char *string)
         if (strtok(NULL, ","))  // contains more than one comma
             goto error;
 
-        if (strcmp(part1, "{") == 0 && strcmp(part2, "}") == 0)
+        if (strcmp(part1, "{") == 0 && strcmp(part2, "}") == 0)     // {,}
             goto error;
 
         if (strcmp(part1, "{") == 0)
@@ -52,7 +56,7 @@ Quantifier *quantifier_new(const char *string)
             part1 += 1;
 
             char *err;
-            min = (int) strtol(part1, &err, 10);
+            min = strtoi(part1, &err);
 
             if (*err)
                 goto error;
@@ -65,7 +69,7 @@ Quantifier *quantifier_new(const char *string)
             part2[strlen(part2) - 1] = '\0';
 
             char *err;
-            max = (int) strtol(part2, &err, 10);
+            max = strtoi(part2, &err);
 
             if (*err)
                 goto error;
@@ -76,7 +80,7 @@ Quantifier *quantifier_new(const char *string)
         if (limited_range && min > max)
             goto error;
     }
-    else                            // fixed count {x}
+    else                            // fixed count {n}
     {
         char working_copy[strlen(string) - 1];
         strncpy(working_copy, string + 1, strlen(string) - 2);
@@ -92,20 +96,9 @@ Quantifier *quantifier_new(const char *string)
     }
 
     Quantifier *quantifier = malloc(sizeof(Quantifier));
-    quantifier->string = calloc(strlen(string) + 1, sizeof(char));
-    strcpy(quantifier->string, string);
-
-    if (min == max)
-    {
-        quantifier->type = fixed;
-        quantifier->value = max;
-    }
-    else
-    {
-        quantifier->type = range;
-        quantifier->min = min;
-        quantifier->max = max;
-    }
+    asprintf(&quantifier->string, "%s", string);
+    quantifier->min = min;
+    quantifier->max = max;
     return quantifier;
 
     error:

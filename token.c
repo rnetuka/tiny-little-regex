@@ -109,6 +109,7 @@ Token *token_new(const char *string)
 
     token->inner_string = inner_string;
     token->type = type;
+    token->quantifier = NULL;
     return token;
 
     error:

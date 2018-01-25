@@ -7,4 +7,5 @@
 void run_tests()
 {
     run_quantifier_tests();
+    run_regex_tests();
 }

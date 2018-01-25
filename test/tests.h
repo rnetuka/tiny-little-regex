@@ -6,3 +6,4 @@
 
 void run_tests();
 void run_quantifier_tests();
+void run_regex_tests();

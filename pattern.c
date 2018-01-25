@@ -50,86 +50,37 @@ void pattern_compile(Pattern *pattern)
     for (int i = 0; pattern->tokens[i] != NULL; i++)
     {
         Token *token = pattern->tokens[i];
+
+        for (int j = 0; j < token->quantifier->min; j++)
+        {
+            State *state = state_machine_add_state(state_machine);
+            state_machine_add_rule(state_machine, connection_point, token, state);
+            connection_point = state;
+        }
+
+        if (token->quantifier->max == -1)
+        {
+            state_machine_add_rule(state_machine, connection_point, token, connection_point);
+        }
+        else if (token->quantifier->min == 0 || token->quantifier->min != token->quantifier->max)
+        {
+            int repetitions = token->quantifier->max - token->quantifier->min;
+
+            connection_point->on_enter = push_to_stack;
+            connection_point->on_enter_param = repetitions;
+            connection_point->on_leave = clear_stack;
+
+            state_machine_add_rule(state_machine,
+                                   .from=connection_point,
+                                   .input=token,
+                                   .stack_top="x",
+                                   .to=connection_point);
+        }
+
         bool last_token = pattern->tokens[i + 1] == NULL;
 
-        switch (token->quantifier->type)
-        {
-            case fixed:
-            {
-                State *state;
-
-                for (int j = 0; j < token->quantifier->value; j++)
-                {
-                    state = state_machine_add_state(state_machine);
-                    state_machine_add_rule(state_machine, connection_point, token, state);
-                    connection_point = state;
-                }
-
-                if (last_token)
-                    connection_point->accepting = true;
-
-                break;
-            }
-
-            case range:
-            {
-                State *state;
-
-                for (int j = 0; j < token->quantifier->min; j++)
-                {
-                    state = state_machine_add_state(state_machine);
-                    state_machine_add_rule(state_machine, connection_point, token, state);
-                    connection_point = state;
-                }
-
-                if (token->quantifier->max == -1)
-                {
-                    state_machine_add_rule(state_machine, connection_point, token, connection_point);
-                }
-                else
-                {
-                    int repetitions = token->quantifier->max - token->quantifier->min;
-
-                    connection_point->on_enter = push_to_stack;
-                    connection_point->on_enter_param = repetitions;
-                    connection_point->on_leave = clear_stack;
-
-                    state_machine_add_rule(state_machine,
-                                           .from=connection_point,
-                                           .input=token,
-                                           .stack_top="x",
-                                           .to=connection_point);
-                }
-
-                if (last_token)
-                    connection_point->accepting = true;
-
-                break;
-            }
-
-            /*case one_or_more:
-            {
-                State *state = state_machine_add_state(state_machine);
-
-                state_machine_add_rule(state_machine, connection_point, token, state);
-                state_machine_add_rule(state_machine, state, token, state);
-
-                connection_point = state;
-
-                if (last_token)
-                    connection_point->accepting = true;
-
-                break;
-            }
-
-            case zero_or_more:
-                state_machine_add_rule(state_machine, connection_point, token, connection_point);
-
-                if (last_token)
-                    connection_point->accepting = true;
-
-                break;*/
-        }
+        if (last_token)
+            connection_point->accepting = true;
     }
     pattern->state_machine = state_machine;
 }
